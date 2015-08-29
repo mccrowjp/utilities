@@ -1,2 +1,3 @@
-# scripts
-A collection of Bioinformatics scripts (mostly Perl)
+# utilities
+A collection of mostly Perl scripts for Bioinformatics
+
