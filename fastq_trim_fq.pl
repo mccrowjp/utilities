@@ -17,7 +17,7 @@ GetOptions ("a=i" => \$minave,
 
 
 my $help = <<HELP;
-FASTQ Quality Trimmer - jmccrow 05/29/2013
+FASTQ Quality Trimmer - 05/29/2013
 Assumes format Phred+33.  Give 2 files to interlace paired data.
 
 Usage: $0 (options) [FASTQ file 1] ([FASTQ file 2])

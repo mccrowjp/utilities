@@ -15,13 +15,13 @@ my $outbase;
 
 GetOptions ("a=i" => \$minave,
             "l=i" => \$minlen,
-	    "o=s" => \$outbase,
-	    "q=i" => \$minq,
-	    "w=i" => \$winsize);
+            "o=s" => \$outbase,
+            "q=i" => \$minq,
+            "w=i" => \$winsize);
 
 
 my $help = <<HELP;
-FASTQ Quality Trimmer (with primer trimming) - jmccrow 05/29/2013
+FASTQ Quality Trimmer (with primer trimming) - 05/29/2013
 Assumes format Phred+33.  Give 2 files to interlace paired data.
 
 Usage: $0 (options) [Primer hits file 1] [FASTQ file 1] ([Primer hits file 2] [FASTQ file 2])
