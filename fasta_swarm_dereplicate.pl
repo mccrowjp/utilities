@@ -3,6 +3,7 @@ use strict;
 use Digest::SHA1 qw(sha1 sha1_hex sha1_base64);
 
 my %seqcount;
+my $seq = "";
 
 sub eachseq {
     if(length($seq) > 0) {
@@ -26,7 +27,6 @@ if(-e $outfile) {
 }
 
 open(IN, $infile) or die "Unable to open file $infile\n";
-my $seq = "";
 while(<IN>) {
     chomp;
     if(/^>/) {
