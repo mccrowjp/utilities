@@ -1,8 +1,10 @@
 #!/usr/bin/env perl
 use strict;
 
+my $id;
+my $seq = "";
+
 sub printGC {
-    my $seq = shift;
     my $n = length($seq);
     
     if($n > 0) {
@@ -28,19 +30,17 @@ unless($fafile) {
     die "Usage: $0 [Nucleotide FASTA]\n";
 }
 
-my $id;
-my $seq = "";
 open(IN, $fafile) or die "Unable to open file $fafile\n";
 while(<IN>) {
     chomp;
     if(/^>/) {
-        printGC($seq);
+        printGC();
         ($id) = split(/[\t\s\r\n]/, $');  #');
         $seq = "";
     } else {
         $seq .= $_;
     }
 }
-printGC($seq);
+printGC();
 
 close(IN);

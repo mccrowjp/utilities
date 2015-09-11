@@ -2,6 +2,8 @@
 use strict;
 
 my %keepid;
+my $infa = shift;
+my $maxlcfrac = shift;
 
 sub evalseq {
     my ($id, $seq) = @_;
@@ -18,9 +20,6 @@ sub evalseq {
 }
 
 ###
-
-my $infa = shift;
-my $maxlcfrac = shift;
 
 unless(length($maxlcfrac) > 0) {
     $maxlcfrac = 0.5;  # Maximum low complexity sequence proportion allowed
