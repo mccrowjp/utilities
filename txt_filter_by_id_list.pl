@@ -13,7 +13,8 @@ unless($inidlist && $infile) {
 open(IN, $inidlist) or die "Unable to open file $inidlist\n";
 while(<IN>) {
     chomp;
-    $ids{$_} = 1;
+    my ($val) = split(/[\t\s,]/);
+    $ids{$val} = 1;
 }
 close(IN);
 
