@@ -44,8 +44,10 @@ while(<IN>) {
 }
 close(IN);
 
-print join("\t", ('id','reads','ave_coverage'))."\n";
+print join("\t", ('id','length','reads','ave_coverage'))."\n";
+my $format = join("\t", ('%s','%d','%d','%.2f'))."\n";
+
 foreach my $rname (sort keys %readcount) {
     my $len = $maxpos{$rname} - $minpos{$rname} + 1;
-    print join("\t", ($rname, $readcount{$rname}, $readlensum{$rname} / $len))."\n";
+    printf $format, $rname, $len, $readcount{$rname}, $readlensum{$rname} / $len;
 }
