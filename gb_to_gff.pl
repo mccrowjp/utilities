@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use Bio::SeqIO;
+
 # requires BioPerl: http://search.cpan.org/~cjfields/BioPerl/
 
 my $infile = shift;
@@ -34,7 +35,20 @@ while(my $objseq = $objseqio->next_seq) {
         
         if(length($locus) > 0) {
             for my $location ( $objfeat->location) {
-                print join("\t", ($acc, $location->start, $location->end, $locus, $protid, $prod_ann))."\n";
+                my $strand;
+                my $s;
+                my $e;
+                if($location->end >= $location->start) {
+                    $strand = '+';
+                    $s = $location->start;
+                    $e = $location->end;
+                } else {
+                    $strand = '-';
+                    $s = $location->end;
+                    $e = $location->start;
+                }
+                my $annstr = join(";", ("ID=".$locus, "product=".$protid, "protein=\"".$prod_ann."\""));
+                print join("\t", ($acc, 'genbank', 'CDS', $s, $e, '.', $strand, '.', $annstr))."\n";
             }
         } else {
             print STDERR "No gene/locus_tag found for CDS on $acc\n";
