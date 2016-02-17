@@ -32,6 +32,8 @@ unless($fafile) {
 
 if($fafile eq '-') {
     open(IN, "<&=STDIN") or die "Unable to read from STDIN\n";
+} elsif($fafile =~ /.gz$/) {
+    open(IN, "gunzip -c $fafile 2>/dev/null |");
 } else {
     open(IN, $fafile) or die "Unable to open file $fafile\n";
 }
