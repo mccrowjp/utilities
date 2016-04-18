@@ -11,15 +11,15 @@ my $seq = "";
 open(IN, $fafile) or die "Unable to open file $fafile\n";
 while(<IN>) {
     chomp;
-    if(/^>/) {
-        $seq .= $_;
+    unless(/^>/) {
+	$seq .= $_;
     }
 }
 close(IN);
 
+$seq =~ s/[\s\t\r\n]//g;
 my $n = length($seq);
 if($n > 0) {
-    $seq =~ s/\s//g;
     my $nogc = $seq;
     my $noat = $seq;
     $nogc =~ s/[gGcC]//g;
@@ -28,6 +28,6 @@ if($n > 0) {
     my $at = $n-length($noat);
     
     if($gc+$at > 0) {
-        printf "%.4f\n", $gc/($gc+$at);
+	printf "%.4f\n", $gc/($gc+$at);
     }
 }
