@@ -1,4 +1,8 @@
 #!/usr/bin/env perl
+#
+# Calculates RPKMs from the output of featureCounts from subread package ( http://subread.sourceforge.net )
+#
+
 use strict;
 
 my $incounts = shift;
