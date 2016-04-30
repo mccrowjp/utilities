@@ -11,7 +11,11 @@ if($pattern && $infa) {
     die "Usage: $0 [pattern] [fasta file]\n";
 }
 
-open(IN, $infa) or die "Unable to open file $infa\n";
+if($infa =~ /\.gz$/) {
+    open(IN, "gunzip -c $infa 2>/dev/null |");
+} else {
+    open(IN, $infa) or die "Unable to open file $infa\n";
+}
 while(<IN>) {
     if(/^>/) {
         $read = 0;
