@@ -49,6 +49,7 @@ def hopen_or_else(infile):
         return f
     else:
         print >>sys.stderr, "Unable to open file: " + infile
+        sys.exit(2)
 
 def hopen_or_else_any(basefile):
     f = hopen_any(basefile)
@@ -56,6 +57,7 @@ def hopen_or_else_any(basefile):
         return f
     else:
         print >>sys.stderr, "Unable to open file: " + basefile
+        sys.exit(2)
 
 def hopen_write(outfile, compression=hCompression.none, level=9):
     f = None
@@ -82,3 +84,4 @@ def hopen_write_or_else(outfile, compression=hCompression.none, level=9):
         return f
     else:
         print >>sys.stderr, "Unable to write to file: " + outfile
+        sys.exit(2)
