@@ -40,6 +40,10 @@ if(length($infile2) > 0) {
     $paired = 1;
 }
 
+unless($outbase) {
+    $outbase = $infile1;
+}
+
 my $outpt;
 if($paired) {
     $outpt = $outbase.".paired_trimmed.fq";
