@@ -1,10 +1,29 @@
 #!/usr/bin/env perl
 use strict;
+use Getopt::Long;
+
+my $verbose = 0;
+my $maxseqs = 100000;
+
+GetOptions ("s=i" => \$maxseqs,
+            "v" => \$verbose);
+
+my $help = <<HELP;
+FASTQ Position Quality
+
+Usage: $0 (options) [FASTQ file(s)...]
+
+  -s int  : Maximum number of sequences to count per file (default: 100000)
+            Setting -s 0 will count all sequences
+
+  -v      : Verbose output
+
+HELP
 
 my @fqfiles = @ARGV;
 
 unless(scalar(@fqfiles) > 0) {
-    die "Usage: $0 [FASTQ file(s)]\n";
+    die $help;
 }
 
 my $maxp = 0;
@@ -21,7 +40,9 @@ foreach my $infq (@fqfiles) {
         open(IN, $infq) or die "Unable to open file $infq\n";
     }
     
-    print STDERR "Reading file: $infq ...\n";
+    if($verbose) {
+        print STDERR "Reading file: $infq ...\n";
+    }
     
     my $rec = 0;
     my $sn = 0;
@@ -42,7 +63,7 @@ foreach my $infq (@fqfiles) {
             $sn = 0;
             $rec++;
         }
-    } until(eof IN || $rec >= 1000000);
+    } until(eof IN || $maxseqs == 0 || $rec >= $maxseqs);
     
     foreach my $p (keys %poscount) {
         $posave{$infq}{$p} = 100.0 * ($possum{$p} / $poscount{$p});
