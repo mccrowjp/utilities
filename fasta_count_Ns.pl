@@ -21,8 +21,7 @@ sub eachseq {
 
 my $infile = shift;
 
-if($infile) {
-} else {
+unless($infile) {
     die "Usage: $0 [fasta file (or .gz)]\n";
 }
 
