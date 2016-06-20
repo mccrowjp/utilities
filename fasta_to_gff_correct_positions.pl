@@ -14,6 +14,7 @@ my $gff_score = '.';
 my $max_offset = 3;
 my $min_match = 0.8;
 my $count = 0;
+my $extend = 0;
 
 ###
 
@@ -70,7 +71,7 @@ sub correct_positions {
             
             my @poslist = ($s-1);
             for(my $i=1; $i<=$max_offset; $i++) {
-                if($s-1+$i+$len-1 <= $n) {
+                if($s-1+$i+$len-1 < $n) {
                     push(@poslist, $s-1+$i);
                 }
                 if($s-1-$i >= 0) {
@@ -100,6 +101,27 @@ sub correct_positions {
                 }
             }
             
+            if($extend) {
+                if($strand eq '-') {
+                    if($bestpos - 3 > 0 && codontable(revcomp(substr($ctgseq, $bestpos-3, 3))) eq '*') {
+                        $bestpos -= 3;
+                        $len += 3;
+                    }
+                    if($bestpos + $len + 2 < $n && codontable(revcomp(substr($ctgseq, $bestpos+$len, 3))) eq 'M') {
+                        $len += 3;
+                    }
+                    
+                } else {
+                    if($bestpos - 3 > 0 && codontable(substr($ctgseq, $bestpos-3, 3)) eq 'M') {
+                        $bestpos -= 3;
+                        $len += 3;
+                    }
+                    if($bestpos + $len + 2 < $n && codontable(substr($ctgseq, $bestpos+$len, 3)) eq '*') {
+                        $len += 3;
+                    }
+                }
+            }
+            
             my $gff_chr = $ctg;
             my $gff_s = $bestpos + 1;
             my $gff_e = $gff_s + $len - 1;
@@ -118,7 +140,8 @@ sub correct_positions {
 
 ###
 
-GetOptions ("s=s" => \$gff_source,
+GetOptions ("x" => \$extend,
+            "s=s" => \$gff_source,
             "f=s" => \$gff_feature);
 
 my $ctgfile = shift;
@@ -129,7 +152,9 @@ Usage: $0 (options) [Contig FASTA file] [ORF peptide FASTA file]
 
   FASTA IDs have format returned by FragGeneScan or similar 
   (eg. contig_1234_5_200_+  with start, end, and strand separated by '_')
-  
+
+  -x       : Extend peptides to include Start-Met and Stop codons if they exist
+
   -s text  : Source to list (project, database, or program name)
              [Default: fasta_to_gff_correct_positions]
 
