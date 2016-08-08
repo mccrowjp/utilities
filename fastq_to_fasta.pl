@@ -20,7 +20,7 @@ Usage: $0 (options)
 
 HELP
 
-if($showhelp || !defined($infile) || !defined($outfile)) {
+if($showhelp || !defined($infile)) {
     die $help;
 }
 
@@ -30,7 +30,7 @@ if(length($outfile) == 0 || $outfile eq '-') {
     open(OUT, ">".$outfile) or die "Unable to write to file $outfile\n";
 }
 
-if(length($infile) == 0 || $infile eq '-') {
+if($infile eq '-') {
     open(IN, "<&=STDIN") or die "Unable to open STDIN\n";
 } else {
     open(IN, $infile) or die "Unable to open file $infile\n";
