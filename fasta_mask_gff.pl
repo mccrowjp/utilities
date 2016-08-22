@@ -8,7 +8,8 @@ my %ctgids;
 my %found;
 
 sub eachseq {
-    my ($id, $seq) = @_;
+    my ($head, $seq) = @_;
+    my ($id) = split(/\s/, $head);
     $seq =~ s/[^A-Za-z]//g;
 
     if(length($seq) > 0) {
@@ -32,7 +33,7 @@ sub eachseq {
             }
         }
         
-        print ">".$id."\n".$seq."\n";
+        print ">".$head."\n".$seq."\n";
     }
 }
 
@@ -64,19 +65,19 @@ if($infile =~ /\.gz$/) {
     open(IN, $infile) or die "Unable to open file $infile\n";
 }
 
-my $id;
+my $head;
 my $seq;
 while(<IN>) {
     chomp;
     if(/^>/) {
-        eachseq($id, $seq);
-        ($id) = split(/\s/, $');  #');
+        eachseq($head, $seq);
+        $head = $';
         $seq = "";
     } else {
         $seq .= $_;
     }
 }
-eachseq($id, $seq);
+eachseq($head, $seq);
 close(IN);
 
 if(scalar(keys %found) < scalar(keys %maskstart)) {
