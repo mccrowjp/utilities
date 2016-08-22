@@ -49,7 +49,7 @@ my $masknum = 0;
 open(IN, $bedfile) or die "Unable to open file $bedfile\n";
 while(<IN>) {
     chomp;
-    my ($ctg, $start, $end, $id) = split(/\t/);
+    my ($ctg, $start, $end) = split(/\t/);
     $masknum++;
     $maskctg{$masknum} = $ctg;
     $maskstart{$masknum} = $start;
