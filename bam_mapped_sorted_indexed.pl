@@ -20,7 +20,8 @@ unless(scalar(@bamfiles) > 0) {
 foreach my $bamfile (@bamfiles) {
     if(-e $bamfile) {
         my $basefile = $bamfile;
-        $basefile =~ s/\.bam$//i;
+        $basefile =~ s/.+\///g;
+        $basefile =~ s/\.(bam|sam)$//i;
         my $msbase = $basefile."_mapped_sorted";
         my $msfile = $msbase.".bam";
         
