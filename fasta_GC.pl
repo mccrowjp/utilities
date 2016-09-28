@@ -30,7 +30,11 @@ unless($fafile) {
     die "Usage: $0 [Nucleotide FASTA]\n";
 }
 
-open(IN, $fafile) or die "Unable to open file $fafile\n";
+if($fafile =~ /\.gz$/) {
+    open(IN, "gunzip -c $fafile 2>/dev/null |");
+} else {
+    open(IN, $fafile) or die "Unable to open file $fafile\n";
+}
 while(<IN>) {
     chomp;
     if(/^>/) {

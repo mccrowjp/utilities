@@ -26,7 +26,11 @@ if(-e $outfile) {
     die "Output file already exists: $outfile\n";
 }
 
-open(IN, $infile) or die "Unable to open file $infile\n";
+if($infile =~ /\.gz$/) {
+    open(IN, "gunzip -c $infile 2>/dev/null |");
+} else {
+    open(IN, $infile) or die "Unable to open file $infile\n";
+}
 while(<IN>) {
     chomp;
     if(/^>/) {

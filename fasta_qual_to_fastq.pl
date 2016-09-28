@@ -73,8 +73,16 @@ unless($infa && $inqual) {
 my $fh1;
 my $fh2;
 
-open($fh1, $infa) or die "Unable to open file $infa\n";
-open($fh2, $inqual) or die "Unable to open file $inqual\n";
+if($infa =~ /\.gz$/) {
+    open(IN, "gunzip -c $infa 2>/dev/null |");
+} else {
+    open($fh1, $infa) or die "Unable to open file $infa\n";
+}
+if($inqual =~ /\.gz$/) {
+    open(IN, "gunzip -c $inqual 2>/dev/null |");
+} else {
+    open($fh2, $inqual) or die "Unable to open file $inqual\n";
+}
 
 my ($head1, $seq, $nexthead1) = read_fasta_record($fh1);
 my ($head2, $qual, $nexthead2) = read_fasta_record($fh2);

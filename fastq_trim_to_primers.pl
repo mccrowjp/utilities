@@ -27,7 +27,11 @@ unless($primfa && $trimfq) {
     die $help;
 }
 
-open(IN, $primfa) or die "Unable to open file $primfa\n";
+if($primfa =~ /\.gz$/) {
+    open(IN, "gunzip -c $primfa 2>/dev/null |");
+} else {
+    open(IN, $primfa) or die "Unable to open file $primfa\n";
+}
 print STDERR "reading $primfa\n";
 
 my $id = "";
@@ -104,7 +108,11 @@ foreach my $qid (keys %bestbs) {
 
 print STDERR "trimming: ".scalar(keys %substr_begin)."\n";
 
-open(IN, $trimfq) or die "Unable to open file $trimfq\n";
+if($trimfq =~ /\.gz$/) {
+    open(IN, "gunzip -c $trimfq 2>/dev/null |");
+} else {
+    open(IN, $trimfq) or die "Unable to open file $trimfq\n";
+}
 print STDERR "reading $trimfq\n";
 
 my $sn = 0;

@@ -24,7 +24,11 @@ print STDERR "Min seq len: $minseqlen\n";
 print STDERR "Sample size: $sampsize\n";
 
 if(length($exfile) > 0) {
-    open(IN, $exfile) or die "Unable to open file $exfile\n";
+    if($exfile =~ /\.gz$/) {
+        open(IN, "gunzip -c $exfile 2>/dev/null |");
+    } else {
+        open(IN, $exfile) or die "Unable to open file $exfile\n";
+    }
     print STDERR "Excluding  : $exfile\n";
     
     while(<IN>) {
@@ -37,7 +41,11 @@ if(length($exfile) > 0) {
 }
 
 my $seq;
-open(IN, $fafile) or die "Unable to open file $fafile\n";
+if($fafile =~ /\.gz$/) {
+    open(IN, "gunzip -c $fafile 2>/dev/null |");
+} else {
+    open(IN, $fafile) or die "Unable to open file $fafile\n";
+}
 while(<IN>) {
     chomp;
     if(/^>/) {
@@ -66,7 +74,11 @@ while($i<scalar(@randseq) && $l<$sampsize) {
 }
 
 $seq = "";
-open(IN, $fafile) or die "Unable to open file $fafile\n";
+if($fafile =~ /\.gz$/) {
+    open(IN, "gunzip -c $fafile 2>/dev/null |");
+} else {
+    open(IN, $fafile) or die "Unable to open file $fafile\n";
+}
 while(<IN>) {
     chomp;
     if(/^>/) {

@@ -63,7 +63,11 @@ if($showhelp || !(length($infile) > 0 || $readSTDIN)) {
 }
 
 if(length($infile) > 0) {
-    open(IN, $infile) or die "Unable to open file $infile\n";
+    if($infile =~ /\.gz$/) {
+        open(IN, "gunzip -c $infile 2>/dev/null |");
+    } else {
+        open(IN, $infile) or die "Unable to open file $infile\n";
+    }
 } else {
     open(IN, "<&=STDIN") or die "Unable to read from STDIN\n";
 }

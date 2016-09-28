@@ -18,7 +18,11 @@ foreach $file (@files) {
     my $mean=0;
     my $sd=0;
     
-    open(IN, $file) or die "Unable to open file $file\n";
+    if($file =~ /\.gz$/) {
+        open(IN, "gunzip -c $file 2>/dev/null |");
+    } else {
+        open(IN, $file) or die "Unable to open file $file\n";
+    }
     while(<IN>) {
         chomp;
         if(/^>/) {

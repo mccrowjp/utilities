@@ -7,7 +7,11 @@ unless($infa) {
     die "Usage: $0 [FASTA file]\n";
 }
 
-open(IN, $infa) or die "Unable to open file $infa\n";
+if($infa =~ /\.gz$/) {
+    open(IN, "gunzip -c $infa 2>/dev/null |");
+} else {
+    open(IN, $infa) or die "Unable to open file $infa\n";
+}
 while(<IN>) {
     chomp;
     if(/^>([^\s]+)\s/) {

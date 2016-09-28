@@ -33,7 +33,11 @@ if(length($outfile) == 0 || $outfile eq '-') {
 if($infile eq '-') {
     open(IN, "<&=STDIN") or die "Unable to open STDIN\n";
 } else {
-    open(IN, $infile) or die "Unable to open file $infile\n";
+    if($infile =~ /\.gz$/) {
+        open(IN, "gunzip -c $infile 2>/dev/null |");
+    } else {
+        open(IN, $infile) or die "Unable to open file $infile\n";
+    }
 }
 
 my $sn = 0;
