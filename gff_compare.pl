@@ -106,11 +106,9 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
     my $e2 = $idend{$infile2}{$ordered_ids2[$i2]};
     
     if($i1 >= scalar(@ordered_ids1)) {
-        #        print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'end1'))."\n";
         addindex($ctg2, "", "", "", $ordered_ids2[$i2], $s2, $e2);
         $i2++;
     } elsif($i2 >= scalar(@ordered_ids2)) {
-        #        print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'end2'))."\n";
         addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, "", "", "");
         $i2++;
         
@@ -119,18 +117,15 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
             # overlap
             if(($s1 <= $s2 && $e1 > $s2) ||
             ($s1 >= $s2 && $e2 > $s1)) {
-                #                print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'overlap'))."\n";
                 addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2], $s2, $e2);
                 $i1++;
                 $i2++;
                 
             } else {
                 if($s1 < $s2) {
-                    #                    print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'left'))."\n";
                     addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, "", "", "");
                     $i1++;
                 } else {
-                    #                    print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'right'))."\n";
                     addindex($ctg2, "", "", "", $ordered_ids2[$i2], $s2, $e2);
                     $i2++;
                 }
@@ -139,19 +134,17 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
             
         } else {
             if($ctg1 eq $lastctg) {
-                #                print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'ctg1'))."\n";
                 addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, "", "", "");
                 $i1++;
                 $lastctg = $ctg1;
 
             } elsif($ctg2 eq $lastctg) {
-                #                print STDERR join("\t", ($i1, $ctg1, $s1, $e1, $i2, $ctg2, $s2, $e2, 'ctg2'))."\n";
                 addindex($ctg2, "", "", "", $ordered_ids2[$i2], $s2, $e2);
                 $i2++;
                 $lastctg = $ctg2;
                 
             } else {
-                die "Error: Bad logic\n";
+                $lastctg = ($ctg1 cmp $ctg2) < 0 ? $ctg1 : $ctg2;
             }
         }
     }
