@@ -7,8 +7,6 @@ my @keys = ('ID', 'transcriptId' ,'proteinId');
 my %idctg;
 my %idstart;
 my %idend;
-my %found1;
-my %found2;
 my %index_ctg;
 my %index_id1;
 my %index_id2;
@@ -21,8 +19,6 @@ my $index = 0;
 
 sub addindex {
     my ($ctg, $id1, $s1, $e1, $id2, $s2, $e2) = @_;
-    $found1{$id1}++ if length($id1) > 0;
-    $found2{$id2}++ if length($id2) > 0;
 
     $index++;
     $index_id1{$index} = $id1;
@@ -39,6 +35,18 @@ sub addindex {
     } else {
         $index_status{$index} = 'new';
     }
+}
+
+sub addindex_merge {
+    my ($ctg, $id1, $s1, $e1, $id2, $s2, $e2, $status) = @_;
+    
+    $index++;
+    $index_id1{$index} = $id1;
+    $index_id2{$index} = $id2;
+    $index_ctg{$index} = $ctg;
+    $index_pos1{$index} = $s1."\t".$e1;
+    $index_pos2{$index} = $s2."\t".$e2;
+    $index_status{$index} = $status;
 }
 
 ###
@@ -88,8 +96,8 @@ foreach my $file ($infile1, $infile2) {
     }
 }
 
-my @ordered_ids1 = (sort {$idctg{$infile1}{$a} cmp $idctg{$infile1}{$b} || $idstart{$infile1}{$a}<=>$idstart{$infile1}{$b}} keys %{$idctg{$infile1}});
-my @ordered_ids2 = (sort {$idctg{$infile2}{$a} cmp $idctg{$infile2}{$b} || $idstart{$infile2}{$a}<=>$idstart{$infile2}{$b}} keys %{$idctg{$infile2}});
+my @ordered_ids1 = (sort {$idctg{$infile1}{$a} cmp $idctg{$infile1}{$b} || $idstart{$infile1}{$a}<=>$idstart{$infile1}{$b} || $idend{$infile1}{$a}<=>$idend{$infile1}{$b}} keys %{$idctg{$infile1}});
+my @ordered_ids2 = (sort {$idctg{$infile2}{$a} cmp $idctg{$infile2}{$b} || $idstart{$infile2}{$a}<=>$idstart{$infile2}{$b} || $idend{$infile2}{$a}<=>$idend{$infile2}{$b}} keys %{$idctg{$infile2}});
 
 print STDERR "comparing genes: ".scalar(@ordered_ids1).", ".scalar(@ordered_ids2)."\n";
 
@@ -117,9 +125,53 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
             # overlap
             if(($s1 <= $s2 && $e1 > $s2) ||
             ($s1 >= $s2 && $e2 > $s1)) {
-                addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2], $s2, $e2);
-                $i1++;
-                $i2++;
+                my $lh_overlap1 = 0;
+                my $lh_overlap2 = 0;
+                my $lh1 = 0;
+                my $lh2 = 0;
+                my $r = 0;
+                
+                # find look-ahead overlaps, for join/split status
+                do {
+                    $r++;
+                    $lh1 = 0;
+                    $lh2 = 0;
+                    my $lh_ctg1 = $idctg{$infile1}{$ordered_ids1[$i1+$r]};
+                    my $lh_s1 = $idstart{$infile1}{$ordered_ids1[$i1+$r]};
+                    my $lh_e1 = $idend{$infile1}{$ordered_ids1[$i1+$r]};
+                    my $lh_ctg2 = $idctg{$infile2}{$ordered_ids2[$i2+$r]};
+                    my $lh_s2 = $idstart{$infile2}{$ordered_ids2[$i2+$r]};
+                    my $lh_e2 = $idend{$infile2}{$ordered_ids2[$i2+$r]};
+                    
+                    if($ctg1 eq $lh_ctg2 && $e1 > $lh_s2) {
+                        $lh_overlap1 = $r;
+                        $lh1 = 1;
+                    }
+                    if($ctg2 eq $lh_ctg1 && $e2 > $lh_s1) {
+                        $lh_overlap2 = $r;
+                        $lh2 = 1;
+                    }
+                } while($lh1 || $lh2);
+                
+                if($lh_overlap1 > 0 && $lh_overlap2 == 0) {
+                    for(my $r=0; $r<=$lh_overlap1; $r++) {
+                        addindex_merge($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2+$r], $idstart{$infile2}{$ordered_ids2[$i2+$r]}, $idend{$infile2}{$ordered_ids2[$i2+$r]}, 'split');
+                    }
+                    $i1++;
+                    $i2 += 1 + $lh_overlap1;
+                    
+                } elsif($lh_overlap2 > 0 && $lh_overlap1 == 0) {
+                    for(my $r=0; $r<=$lh_overlap1; $r++) {
+                        addindex($ctg2, $ordered_ids1[$i1+$r], $idstart{$infile1}{$ordered_ids1[$i1+$r]}, $idend{$infile1}{$ordered_ids1[$i1+$r]}, $ordered_ids2[$i2], $s2, $e2, 'join');
+                    }
+                    $i1 += 1 + $lh_overlap2;
+                    $i2++;
+                    
+                } else {
+                    addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2], $s2, $e2);
+                    $i1++;
+                    $i2++;
+                }
                 
             } else {
                 if($s1 < $s2) {
@@ -160,15 +212,4 @@ for(my $i=1; $i<=$index; $i++) {
 
 foreach my $status (sort {$statuscount{$b}<=>$statuscount{$a}} keys %statuscount) {
     print STDERR $statuscount{$status}."\t".$status."\n";
-}
-
-foreach my $id (sort {$found1{$b}<=>$found1{$a}} keys %found1) {
-    if($found1{$id} > 1) {
-        print STDERR "split\t".$found1{$id}."\n";
-    }
-}
-foreach my $id (sort {$found2{$b}<=>$found2{$a}} keys %found2) {
-    if($found2{$id} > 1) {
-        print STDERR "joined\t".$found2{$id}."\n";
-    }
 }
