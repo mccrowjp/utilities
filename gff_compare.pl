@@ -110,7 +110,7 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
         $i2++;
     } elsif($i2 >= scalar(@ordered_ids2)) {
         addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, "", "", "");
-        $i2++;
+        $i1++;
         
     } else {
         if($ctg1 eq $ctg2) {
