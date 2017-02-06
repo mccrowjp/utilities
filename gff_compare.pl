@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
-# list of all keys that identify the gene identifier
+# list of all gene identifiers
 my @keys = ('ID', 'transcriptId' ,'proteinId');
 
 my %idctg;
@@ -51,11 +51,14 @@ sub addindex_merge {
 
 ###
 
-my $infile1 = shift;
-my $infile2 = shift;
+my ($infile1, $infile2, @rest) = @ARGV;
 
 unless($infile1 && $infile2) {
-    die "Usage: $0 [GFF file 1] [GFF file 2]\n";
+    die "Usage: $0 [GFF file 1] [GFF file 2] ([optional gene identifiers]... (default: ID transcriptId proteinId))\n";
+}
+
+if(scalar(@rest) > 0) {
+    @keys = @rest;
 }
 
 foreach my $file ($infile1, $infile2) {
