@@ -125,52 +125,87 @@ while($i1 < scalar(@ordered_ids1) || $i2 < scalar(@ordered_ids2)) {
             # overlap
             if(($s1 <= $s2 && $e1 > $s2) ||
             ($s1 >= $s2 && $e2 > $s1)) {
-                my $lh_overlap1 = 0;
-                my $lh_overlap2 = 0;
-                my $lh1 = 0;
-                my $lh2 = 0;
-                my $r = 0;
-                
-                # find look-ahead overlaps, for join/split status
-                do {
-                    $r++;
-                    $lh1 = 0;
-                    $lh2 = 0;
-                    my $lh_ctg1 = $idctg{$infile1}{$ordered_ids1[$i1+$r]};
-                    my $lh_s1 = $idstart{$infile1}{$ordered_ids1[$i1+$r]};
-                    my $lh_e1 = $idend{$infile1}{$ordered_ids1[$i1+$r]};
-                    my $lh_ctg2 = $idctg{$infile2}{$ordered_ids2[$i2+$r]};
-                    my $lh_s2 = $idstart{$infile2}{$ordered_ids2[$i2+$r]};
-                    my $lh_e2 = $idend{$infile2}{$ordered_ids2[$i2+$r]};
-                    
-                    if($ctg1 eq $lh_ctg2 && $e1 > $lh_s2) {
-                        $lh_overlap1 = $r;
-                        $lh1 = 1;
-                    }
-                    if($ctg2 eq $lh_ctg1 && $e2 > $lh_s1) {
-                        $lh_overlap2 = $r;
-                        $lh2 = 1;
-                    }
-                } while($lh1 || $lh2);
-                
-                if($lh_overlap1 > 0 && $lh_overlap2 == 0) {
-                    for(my $r=0; $r<=$lh_overlap1; $r++) {
-                        addindex_merge($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2+$r], $idstart{$infile2}{$ordered_ids2[$i2+$r]}, $idend{$infile2}{$ordered_ids2[$i2+$r]}, 'split');
-                    }
-                    $i1++;
-                    $i2 += 1 + $lh_overlap1;
-                    
-                } elsif($lh_overlap2 > 0 && $lh_overlap1 == 0) {
-                    for(my $r=0; $r<=$lh_overlap1; $r++) {
-                        addindex($ctg2, $ordered_ids1[$i1+$r], $idstart{$infile1}{$ordered_ids1[$i1+$r]}, $idend{$infile1}{$ordered_ids1[$i1+$r]}, $ordered_ids2[$i2], $s2, $e2, 'join');
-                    }
-                    $i1 += 1 + $lh_overlap2;
-                    $i2++;
-                    
-                } else {
+                # exact match, status kept
+                if($s1 == $s2 && $e1 == $e2) {
                     addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2], $s2, $e2);
                     $i1++;
                     $i2++;
+                } else {
+                    my $lh_overlap1 = 0;
+                    my $lh_overlap2 = 0;
+                    my $lh1 = 0;
+                    my $lh2 = 0;
+                    my $r = 0;
+                    
+                    # find look-ahead overlaps, for join/split status
+                    do {
+                        $r++;
+                        $lh1 = 0;
+                        $lh2 = 0;
+                        my $lh_ctg1 = $idctg{$infile1}{$ordered_ids1[$i1+$r]};
+                        my $lh_s1 = $idstart{$infile1}{$ordered_ids1[$i1+$r]};
+                        my $lh_e1 = $idend{$infile1}{$ordered_ids1[$i1+$r]};
+                        my $lh_ctg2 = $idctg{$infile2}{$ordered_ids2[$i2+$r]};
+                        my $lh_s2 = $idstart{$infile2}{$ordered_ids2[$i2+$r]};
+                        my $lh_e2 = $idend{$infile2}{$ordered_ids2[$i2+$r]};
+                        
+                        if($ctg1 eq $lh_ctg2 && $e1 > $lh_s2) {
+                            $lh_overlap1 = $r;
+                            $lh1 = 1;
+                        }
+                        if($ctg2 eq $lh_ctg1 && $e2 > $lh_s1) {
+                            $lh_overlap2 = $r;
+                            $lh2 = 1;
+                        }
+                    } while($lh1 || $lh2);
+                    
+                    if($lh_overlap1 > 0 && $lh_overlap2 == 0) {
+                        my $contains_exact_match = 0;
+                        for(my $r=0; $r<=$lh_overlap1; $r++) {
+                            if($s1 == $idstart{$infile2}{$ordered_ids2[$i2+$r]} && $e1 == $idend{$infile2}{$ordered_ids2[$i2+$r]}) {
+                                $contains_exact_match = 1;
+                            }
+                        }
+                        for(my $r=0; $r<=$lh_overlap1; $r++) {
+                            if($contains_exact_match) {
+                                if($s1 == $idstart{$infile2}{$ordered_ids2[$i2+$r]} && $e1 == $idend{$infile2}{$ordered_ids2[$i2+$r]}) {
+                                    addindex_merge($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2+$r], $idstart{$infile2}{$ordered_ids2[$i2+$r]}, $idend{$infile2}{$ordered_ids2[$i2+$r]}, 'kept');
+                                } else {
+                                    addindex_merge($ctg1, "", "", "", $ordered_ids2[$i2+$r], $idstart{$infile2}{$ordered_ids2[$i2+$r]}, $idend{$infile2}{$ordered_ids2[$i2+$r]}, 'new');
+                                }
+                            } else {
+                                addindex_merge($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2+$r], $idstart{$infile2}{$ordered_ids2[$i2+$r]}, $idend{$infile2}{$ordered_ids2[$i2+$r]}, 'split');
+                            }
+                        }
+                        $i1++;
+                        $i2 += 1 + $lh_overlap1;
+                        
+                    } elsif($lh_overlap2 > 0 && $lh_overlap1 == 0) {
+                        my $contains_exact_match = 0;
+                        for(my $r=0; $r<=$lh_overlap2; $r++) {
+                            if($s2 == $idstart{$infile1}{$ordered_ids1[$i1+$r]} && $e2 == $idend{$infile1}{$ordered_ids1[$i1+$r]}) {
+                                $contains_exact_match = 1;
+                            }
+                        }
+                        for(my $r=0; $r<=$lh_overlap2; $r++) {
+                            if($contains_exact_match) {
+                                if($s2 == $idstart{$infile1}{$ordered_ids1[$i1+$r]} && $e2 == $idend{$infile1}{$ordered_ids1[$i1+$r]}) {
+                                    addindex_merge($ctg2, $ordered_ids1[$i1+$r], $idstart{$infile1}{$ordered_ids1[$i1+$r]}, $idend{$infile1}{$ordered_ids1[$i1+$r]}, $ordered_ids2[$i2], $s2, $e2, 'kept');
+                                } else {
+                                    addindex_merge($ctg2, $ordered_ids1[$i1+$r], $idstart{$infile1}{$ordered_ids1[$i1+$r]}, $idend{$infile1}{$ordered_ids1[$i1+$r]}, "", "", "", 'deleted');
+                                }
+                            } else {
+                                addindex_merge($ctg2, $ordered_ids1[$i1+$r], $idstart{$infile1}{$ordered_ids1[$i1+$r]}, $idend{$infile1}{$ordered_ids1[$i1+$r]}, $ordered_ids2[$i2], $s2, $e2, 'join');
+                            }
+                        }
+                        $i1 += 1 + $lh_overlap2;
+                        $i2++;
+                        
+                    } else {
+                        addindex($ctg1, $ordered_ids1[$i1], $s1, $e1, $ordered_ids2[$i2], $s2, $e2);
+                        $i1++;
+                        $i2++;
+                    }
                 }
                 
             } else {
