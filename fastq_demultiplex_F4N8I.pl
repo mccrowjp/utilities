@@ -82,7 +82,7 @@ do {
         }
         if($sn == 2 || $sn == 4) {
             $rec1 .= substr($line1, $indexlen+4);
-            $rec2 .= substr($line2, $indexlen+4);
+            $rec2 .= $line2;
         } else {
             $rec1 .= $line1;
             $rec2 .= $line2;
