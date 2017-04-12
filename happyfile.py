@@ -23,6 +23,9 @@ class hCompression:
     bzip2 = 2
     bz2 = 2
 
+def xprint(s):
+    sys.stderr.write(str(s) + '\n')
+        
 def hopen(infile):
     f = None
     try:
@@ -48,7 +51,7 @@ def hopen_or_else(infile):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to open file: " + infile
+        xprint("Unable to open file: " + infile)
         sys.exit(2)
 
 def hopen_or_else_any(basefile):
@@ -56,7 +59,7 @@ def hopen_or_else_any(basefile):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to open file: " + basefile
+        xprint("Unable to open file: " + basefile)
         sys.exit(2)
 
 def hopen_write(outfile, compression=hCompression.none, level=9):
@@ -83,5 +86,5 @@ def hopen_write_or_else(outfile, compression=hCompression.none, level=9):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
+        xprint("Unable to write to file: " + outfile)
         sys.exit(2)
