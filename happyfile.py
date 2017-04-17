@@ -30,9 +30,9 @@ def hopen(infile):
     f = None
     try:
         if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
+            f = bz2.open(infile, 'rt')
         elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
+            f = gzip.open(infile, 'rt')
         else:
             f = open(infile)
     except IOError:
