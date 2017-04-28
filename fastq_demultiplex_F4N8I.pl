@@ -14,6 +14,10 @@ unless(length($fqR1file) > 0 && length($fqR2file) > 0 && $indexlen > 0) {
     die "Usage: $0 [FASTQ R1 file] [FASTQ R2 file] [Adapter index sequence] ([Output base name])\n";
 }
 
+unless(-e $fqR1file && -e $fqR2file) {
+	die "File(s) do not exist: ".$fqR1file.", ".$fqR2file."\n";
+}
+
 unless(length($outbase) > 0) {
     $outbase = $fqR1file;
     $outbase =~ s/\.(fastq|fq)$//i;

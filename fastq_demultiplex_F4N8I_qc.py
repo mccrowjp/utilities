@@ -12,10 +12,10 @@ count_total = 0
 count_index = 0
 
 def xprint_err(s):
-        sys.stderr.write(str(s) + '\n')
+    sys.stderr.write(str(s) + '\n')
 
 def xprint_out(s):
-        sys.stdout.write(str(s) + '\n')
+    sys.stdout.write(str(s) + '\n')
 
         
 def read_index_file(index_file):
@@ -35,6 +35,8 @@ def read_index_file(index_file):
 
 def read_fastq(fastq_file):
     global dict_index_count
+    global count_total
+    global count_index
 
     in_handle = happyfile.hopen_or_else(fastq_file)
     xprint_err("reading file: " + fastq_file)
@@ -48,22 +50,34 @@ def read_fastq(fastq_file):
         if rnum == 2:
             idx = line[4:12]
             dict_index_count[idx] = dict_index_count.get(idx, 0) + 1
+            count_total += 1
+            if dict_is_index.get(idx, False):
+            	count_index += 1
         rnum += 1
         if rnum > 4:
             rnum = 1
 
 def print_results():
-    global dict_index_count
+	global dict_is_index
+	global dict_index_count
+	global count_total
+	global count_index
 
-    xprint_out("Indexes:")
-    for idx in sorted(dict_is_index, key=dict_index_count.get, reverse=True):
-        xprint_out(idx + '\t' + str(dict_index_count.get(idx, 0)))
+	xprint_out("Indexes:")
+	for idx in sorted(dict_is_index, key=dict_index_count.get(0), reverse=True):
+		xprint_out(idx + '\t' + str(dict_index_count.get(idx, 0)))
 
-    xprint_out('\n' + "Top 10 undetermined indexes:")
-    for idx in sorted(dict_index_count, key=dict_index_count.get, reverse=True)[:10]:
-        if not dict_is_index.get(idx, False):
-            xprint_out(idx + '\t' + str(dict_index_count.get(idx, 0)))
-            
+	xprint_out('\n' + "Top 20 undetermined indexes:")
+	count_not_index = 0
+	for idx in sorted(dict_index_count, key=dict_index_count.get, reverse=True):
+		if not dict_is_index.get(idx, False):
+			if count_not_index < 20:
+				xprint_out(str(idx) + "\t" + str(dict_index_count.get(idx, 0)))
+			count_not_index += 1
+		
+	xprint_out('\n' + "Total sequences: " + str(count_total))
+	xprint_out("Indexed sequences: " + str(count_index))
+
 ###
 
 def main(argv):
