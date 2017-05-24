@@ -26,23 +26,21 @@ close(IN);
 
 foreach my $srr (sort keys %srrname) {
     print STDERR $srr." -> ".$srrname{$srr}."\n";
-    my $srrfile1 = $srr."_1.fastq";
-    my $srrfile2 = $srr."_2.fastq";
-    my $newfile1 = $srrname{$srr}."_R1.fastq";
-    my $newfile2 = $srrname{$srr}."_R2.fastq";
+    my $srrfile1 = $srr."_1.fastq.gz";
+    my $srrfile2 = $srr."_2.fastq.gz";
+    my $newfile1 = $srrname{$srr}."_R1.fastq.gz";
+    my $newfile2 = $srrname{$srr}."_R2.fastq.gz";
 
     if(-e $srrfile1 && -e $srrfile2) {
         print STDERR "skipping download: $srr\n";
     } else {
-        runcmd("fastq-dump --split-files", $srr);
+        runcmd("fastq-dump --gzip --split-files", $srr);
     }
     
     if(-e $srrfile1) {
         runcmd("mv", $srrfile1, $newfile1);
-        runcmd("gzip", $newfile1);
     }
     if(-e $srrfile2) {
         runcmd("mv", $srrfile2, $newfile2);
-        runcmd("gzip", $newfile2);
     }
 }
