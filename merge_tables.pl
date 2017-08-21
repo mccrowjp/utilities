@@ -41,7 +41,11 @@ unless($file1 && $file2) {
 # Find datatype of all columns
 
 my $fl = 1;
-open(IN, $file1) or die "Unable to open file $file1\n";
+if($file1 =~ /\.gz$/) {
+    open(IN, "gunzip -c $file1 2>/dev/null |");
+} else {
+    open(IN, $file1) or die "Unable to open file $file1\n";
+}
 while(<IN>) {
     chomp;
     my ($id, @rest) = split(/\t/);
@@ -68,7 +72,11 @@ while(<IN>) {
 close(IN);
 
 $fl = 1;
-open(IN, $file2) or die "Unable to open file $file2\n";
+if($file2 =~ /\.gz$/) {
+    open(IN, "gunzip -c $file2 2>/dev/null |");
+} else {
+    open(IN, $file2) or die "Unable to open file $file2\n";
+}
 while(<IN>) {
     chomp;
     my ($id, @rest) = split(/\t/);
