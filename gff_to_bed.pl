@@ -4,6 +4,7 @@ use strict;
 my %idctg;
 my %idstart;
 my %idend;
+my %idstrand;
 
 my $infile = shift;
 my $key = shift;
@@ -39,6 +40,7 @@ while(<IN>) {
                 $id =~ s/[\"\']//g;
                 
                 $idctg{$id} = $ctg;
+                $idstrand{$id} = $strand;
                 
                 if(!defined($idstart{$id}) || $s < $idstart{$id}) {
                     $idstart{$id} = $s;
@@ -56,10 +58,11 @@ while(<IN>) {
             $idctg{$id} = $ctg;
             $idstart{$id} = $s;
             $idend{$id} = $e;
+            $idstrand{$id} = $strand;
         }
     }
 }
 
 foreach my $id (sort {$idctg{$a} cmp $idctg{$b} || $idstart{$a}<=>$idstart{$b}} keys %idctg) {
-    print join("\t", ($idctg{$id}, $idstart{$id}, $idend{$id}, $id))."\n";
+    print join("\t", ($idctg{$id}, $idstart{$id}, $idend{$id}, $id, '.', $idstrand{$id}))."\n";
 }
