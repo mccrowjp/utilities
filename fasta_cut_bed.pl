@@ -4,6 +4,7 @@ use strict;
 my %cutctg;
 my %cutstart;
 my %cutend;
+my %cutstrand;
 my %ctgids;
 my %found;
 
@@ -16,7 +17,12 @@ sub eachseq {
                 $found{$cut} = 1;
                 my $s = $cutstart{$cut} - 1;
                 my $len = $cutend{$cut} - $cutstart{$cut} + 1;
-                printf ">%s %s %d-%d\n%s\n", $cut, $id, $cutstart{$cut}, $cutend{$cut}, substr($seq, $s, $len);
+                my $cutseq = substr($seq, $s, $len);
+                if($cutstrand{$cut} eq '-') {
+                    $cutseq =~ tr/ACGTacgt/TGCAtgca/;
+                    $cutseq = reverse($cutseq);
+                }
+                printf ">%s %s %d-%d %s\n%s\n", $cut, $id, $cutstart{$cut}, $cutend{$cut}, $cutstrand{$cut}, $cutseq;
             }
         }
     }
@@ -34,13 +40,14 @@ unless($infile && $bedfile) {
 open(IN, $bedfile) or die "Unable to open file $bedfile\n";
 while(<IN>) {
     chomp;
-    my ($ctg, $start, $end, $id) = split(/\t/);
+    my ($ctg, $start, $end, $id, $score, $strand) = split(/\t/);
     if(exists($cutstart{$id})) {
         die "Duplicate ID: $id in BED file: $bedfile\n";
     }
     $cutctg{$id} = $ctg;
     $cutstart{$id} = $start;
     $cutend{$id} = $end;
+    $cutstrand{$id} = $strand;
     push(@{$ctgids{$ctg}}, $id);
 }
 close(IN);
