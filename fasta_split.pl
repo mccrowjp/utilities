@@ -15,7 +15,7 @@ GetOptions ("i=s" => \$infa,
             "o=s" => \$outbase);
 
 my $help = <<HELP;
-Split FASTA into multiple files base name _#
+Split FASTA into multiple files: base name_#
 
 Usage: $0 (options)
 
@@ -24,7 +24,7 @@ Usage: $0 (options)
     -o path : Output FASTA base name
   Must specify one of the following:
     -f int  : Number of files
-    -s int  : NUmber of sequences
+    -s int  : Number of sequences
 
 HELP
 
