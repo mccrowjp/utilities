@@ -50,13 +50,13 @@ unless($numseqs > 0) {
     close(IN);
     
     $numseqs = int($totseqs / $numfiles)+1;
-}
 
-print "Splitting $totseqs sequences into $numfiles files (<= $numseqs per file)\n";
+    print STDERR "Splitting $totseqs sequences into $numfiles files (<= $numseqs per file)\n";
+}
 
 my $fnum = 1;
 my $outfile = $outbase."_".$fnum;
-my $i=0;
+my $i = 0;
 open(OUT, ">".$outfile) or die "Unable to write to file $outfile\n";
 
 if($infa =~ /\.gz$/) {
@@ -73,7 +73,7 @@ while(<IN>) {
             $fnum++;
             $outfile = $outbase."_".$fnum;
             open(OUT, ">".$outfile) or die "Unable to write to file $outfile\n";
-            $i=1;
+            $i = 1;
         }
     }
     print OUT $_;
